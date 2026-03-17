@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AI GTM Campaign Planner & Optimizer</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: system-ui, sans-serif; background: #f5f5f5; color: #1a1a1a; padding: 2rem; }
+    .container { max-width: 900px; margin: 0 auto; }
+    .header { margin-bottom: 2rem; }
+    .header h1 { font-size: 22px; font-weight: 700; margin-bottom: 4px; }
+    .header p { font-size: 14px; color: #666; }
+    .phase-nav { display: flex; border: 1px solid #e5e5e5; border-radius: 10px; overflow: hidden; margin-bottom: 1.5rem; background: white; }
+    .phase-btn { flex: 1; padding: 12px; font-size: 13px; border: none; background: transparent; cursor: pointer; color: #666; transition: all .15s; display: flex; flex-direction: column; align-items: center; gap: 2px; border-right: 1px solid #e5e5e5; }
+    .phase-btn:last-child { border-right: none; }
+    .phase-btn:hover { background: #f9f9f9; }
+    .phase-btn.active { background: #f9f9f9; color: #1a1a1a; font-weight: 600; }
+    .phase-btn .phase-sub { font-size: 11px; color: #999; }
+    .phase-btn.active .phase-sub { color: #666; }
+    .card { background: white; border-radius: 12px; border: 1px solid #e5e5e5; padding: 1.5rem; margin-bottom: 16px; }
+    .card h2 { font-size: 15px; font-weight: 600; margin-bottom: 1rem; }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .form-full { grid-column: 1 / -1; }
+    .field { display: flex; flex-direction: column; gap: 5px; }
+    .field label { font-size: 12px; color: #666; font-weight: 500; }
+    .field input, .field select, .field textarea { font-size: 13px; padding: 8px 10px; border: 1px solid #ddd; border-radius: 8px; background: white; color: #1a1a1a; font-family: inherit; }
+    .field textarea { resize: vertical; min-height: 72px; }
+    .chips { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 4px; }
+    .chip { padding: 6px 12px; font-size: 12px; border: 1px solid #ddd; border-radius: 20px; cursor: pointer; color: #666; user-select: none; transition: all .15s; }
+    .chip.on { background: #EFF6FF; color: #1D4ED8; border-color: #93C5FD; font-weight: 500; }
+    .btn-run { width: 100%; padding: 12px; font-size: 14px; font-weight: 600; border: none; border-radius: 8px; background: #1a1a1a; color: white; cursor: pointer; margin-top: 12px; transition: opacity .15s; }
+    .btn-run:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn-run:hover:not(:disabled) { opacity: 0.85; }
+    .spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid #ccc; border-top-color: #fff; border-radius: 50%; animation: spin .7s linear infinite; vertical-align: middle; margin-right: 6px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .metrics-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 16px; }
+    .metric { background: #f9f9f9; border-radius: 8px; padding: 14px; }
+    .metric-label { font-size: 12px; color: #666; margin-bottom: 4px; }
+    .metric-value { font-size: 22px; font-weight: 700; }
+    .alloc-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    .alloc-card { background: #f9f9f9; border-radius: 8px; padding: 14px; }
+    .alloc-ch { font-size: 12px; color: #666; margin-bottom: 4px; }
+    .alloc-pct { font-size: 24px; font-weight: 700; color: #1a1a1a; }
+    .alloc-usd { font-size: 13px; color: #444; margin-bottom: 6px; }
+    .bar-bg { height: 4px; background: #e5e5e5; border-radius: 2px; margin-bottom: 8px; }
+    .bar-fill { height: 4px; border-radius: 2px; }
+    .alloc-roas { font-size: 12px; color: #666; }
+    .alloc-roas b { color: #1a1a1a; }
+    .alloc-why { font-size: 11px; color: #888; margin-top: 6px; line-height: 1.4; }
+    .score-row { display: flex; align-items: center; gap: 16px; padding: 14px; background: #f9f9f9; border-radius: 8px; margin-bottom: 12px; }
+    .score-num { font-size: 36px; font-weight: 700; }
+    .score-good { color: #16a34a; } .score-warn { color: #d97706; } .score-bad { color: #dc2626; }
+    .score-lbl { font-size: 14px; font-weight: 600; margin-bottom: 2px; }
+    .score-sub { font-size: 12px; color: #666; }
+    .checks-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .check { display: flex; gap: 10px; padding: 10px 12px; border-radius: 8px; align-items: flex-start; }
+    .check-pass { background: #f0fdf4; border: 1px solid #bbf7d0; }
+    .check-warn { background: #fffbeb; border: 1px solid #fde68a; }
+    .check-fail { background: #fef2f2; border: 1px solid #fecaca; }
+    .check-icon { font-size: 14px; flex-shrink: 0; }
+    .check-name { font-size: 13px; font-weight: 500; margin-bottom: 2px; }
+    .check-note { font-size: 12px; color: #555; line-height: 1.4; }
+    .insight { padding: 12px 14px; border-radius: 8px; margin-bottom: 8px; }
+    .insight-success { background: #f0fdf4; border-left: 3px solid #16a34a; }
+    .insight-warning { background: #fffbeb; border-left: 3px solid #d97706; }
+    .insight-danger { background: #fef2f2; border-left: 3px solid #dc2626; }
+    .insight-title { font-size: 13px; font-weight: 600; margin-bottom: 3px; }
+    .insight-body { font-size: 13px; color: #555; line-height: 1.5; }
+    .rec-row { display: flex; gap: 12px; padding: 12px 0; border-bottom: 1px solid #f0f0f0; align-items: flex-start; }
+    .rec-row:last-child { border-bottom: none; padding-bottom: 0; }
+    .rec-badge { font-size: 11px; padding: 2px 8px; border-radius: 10px; font-weight: 600; white-space: nowrap; margin-top: 6px; display: inline-block; }
+    .badge-high { background: #f0fdf4; color: #16a34a; }
+    .badge-med { background: #fffbeb; color: #d97706; }
+    .badge-low { background: #f5f5f5; color: #666; }
+    .rec-action { font-size: 13px; font-weight: 600; margin-bottom: 2px; }
+    .rec-rationale { font-size: 12px; color: #555; line-height: 1.5; }
+    .summary-box { background: #f9f9f9; border-radius: 8px; padding: 14px 16px; font-size: 13px; line-height: 1.7; }
+    .summary-lbl { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .05em; color: #888; margin-bottom: 8px; }
+    .flag-row { display: flex; gap: 10px; padding: 10px 0; border-bottom: 1px solid #f0f0f0; align-items: flex-start; }
+    .flag-row:last-child { border-bottom: none; }
+    .flag-tag { font-size: 11px; padding: 2px 8px; border-radius: 10px; font-weight: 600; white-space: nowrap; flex-shrink: 0; margin-top: 2px; }
+    .flag-human { background: #fffbeb; color: #d97706; }
+    .flag-auto { background: #f0fdf4; color: #16a34a; }
+    .flag-item { font-size: 13px; font-weight: 500; margin-bottom: 2px; }
+    .flag-detail { font-size: 12px; color: #666; }
+    .status-badge { font-size: 11px; padding: 3px 10px; border-radius: 20px; font-weight: 600; }
+    .status-under { background: #fef2f2; color: #dc2626; }
+    .status-track { background: #f0fdf4; color: #16a34a; }
+    .status-risk { background: #fffbeb; color: #d97706; }
+    .error { background: #fef2f2; border-left: 3px solid #dc2626; padding: 12px 14px; border-radius: 8px; font-size: 13px; color: #991b1b; line-height: 1.6; }
+    code { background: #f5f5f5; padding: 2px 6px; border-radius: 4px; font-size: 12px; }
+    #plan-output { display: none; }
+    #optimize-output { display: none; }
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <h1>AI GTM Campaign Planner & Optimizer</h1>
+    <p>Full-cycle GTM intelligence · Powered by Claude · Built with Python + FastAPI</p>
+  </div>
+
+  <div class="phase-nav">
+    <button class="phase-btn active" id="btn-plan" onclick="showPhase('plan')">
+      🗓 Plan
+      <span class="phase-sub">Pre-launch strategy</span>
+    </button>
+    <button class="phase-btn" id="btn-optimize" onclick="showPhase('optimize')">
+      📊 Optimize
+      <span class="phase-sub">Live campaign analysis</span>
+    </button>
+  </div>
+
+  <!-- PLAN PHASE -->
+  <div id="plan-phase">
+    <div class="card">
+      <h2>Campaign Brief — AI will analyze this and return a full plan</h2>
+      <div class="form-grid">
+        <div class="field">
+          <label>Total budget (USD)</label>
+          <input id="p-budget" type="number" placeholder="e.g. 50000" />
+        </div>
+        <div class="field">
+          <label>Campaign objective</label>
+          <select id="p-objective">
+            <option>Brand Awareness</option>
+            <option>Lead Generation</option>
+            <option selected>Conversions / Sales</option>
+            <option>Retargeting</option>
+            <option>App Installs</option>
+          </select>
+        </div>
+        <div class="field form-full">
+          <label>Product or service</label>
+          <input id="p-product" type="text" placeholder="e.g. B2B SaaS project management tool" />
+        </div>
+        <div class="field form-full">
+          <label>Target audience</label>
+          <textarea id="p-audience" placeholder="e.g. Marketing managers at 50-500 employee companies, US-based"></textarea>
+        </div>
+        <div class="field">
+          <label>Campaign timeline</label>
+          <select id="p-timeline">
+            <option value="4">4 weeks</option>
+            <option value="8" selected>8 weeks</option>
+            <option value="12">12 weeks</option>
+            <option value="16">16 weeks</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Channels</label>
+          <div class="chips" id="plan-chips">
+            <div class="chip on" onclick="toggleChip(this)">Display</div>
+            <div class="chip on" onclick="toggleChip(this)">Paid Search</div>
+            <div class="chip on" onclick="toggleChip(this)">Video</div>
+            <div class="chip" onclick="toggleChip(this)">Email</div>
+            <div class="chip" onclick="toggleChip(this)">Affiliate</div>
+          </div>
+        </div>
+      </div>
+      <button class="btn-run" id="plan-btn" onclick="runPlan()">Analyze Campaign →</button>
+    </div>
+    <div id="plan-output"></div>
+  </div>
+
+  <!-- OPTIMIZE PHASE -->
+  <div id="optimize-phase" style="display:none">
+    <div class="card">
+      <h2>Live Campaign Metrics — AI will diagnose and recommend actions</h2>
+      <div class="form-grid">
+        <div class="field">
+          <label>Campaign name</label>
+          <input id="o-name" type="text" placeholder="e.g. Display Retargeting Q2" />
+        </div>
+        <div class="field">
+          <label>Channel</label>
+          <select id="o-channel">
+            <option>Display</option>
+            <option>Paid Search</option>
+            <option>Video</option>
+            <option>Email</option>
+            <option>Affiliate</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>ROAS (e.g. 1.4)</label>
+          <input id="o-roas" type="number" step="0.1" placeholder="e.g. 1.4" />
+        </div>
+        <div class="field">
+          <label>CTR % (e.g. 0.8)</label>
+          <input id="o-ctr" type="number" step="0.1" placeholder="e.g. 0.8" />
+        </div>
+        <div class="field">
+          <label>Total spend (USD)</label>
+          <input id="o-spend" type="number" placeholder="e.g. 42000" />
+        </div>
+        <div class="field">
+          <label>Conversion rate % (e.g. 1.1)</label>
+          <input id="o-cvr" type="number" step="0.1" placeholder="e.g. 1.1" />
+        </div>
+        <div class="field">
+          <label>Ad frequency (impressions/user)</label>
+          <input id="o-freq" type="number" step="0.1" placeholder="e.g. 9.4" />
+        </div>
+        <div class="field">
+          <label>Campaign objective</label>
+          <select id="o-objective">
+            <option>Brand Awareness</option>
+            <option>Lead Generation</option>
+            <option selected>Conversions / Sales</option>
+            <option>Retargeting</option>
+          </select>
+        </div>
+      </div>
+      <button class="btn-run" id="optimize-btn" onclick="runOptimize()">Diagnose Campaign →</button>
+    </div>
+    <div id="optimize-output"></div>
+  </div>
+</div>
+
+<script>
+  function showPhase(phase) {
+    document.getElementById('plan-phase').style.display = phase === 'plan' ? 'block' : 'none';
+    document.getElementById('optimize-phase').style.display = phase === 'optimize' ? 'block' : 'none';
+    document.getElementById('btn-plan').classList.toggle('active', phase === 'plan');
+    document.getElementById('btn-optimize').classList.toggle('active', phase === 'optimize');
+  }
+
+  function toggleChip(el) { el.classList.toggle('on'); }
+
+  const BAR_COLORS = ['#3B82F6','#10B981','#F59E0B','#EF4444','#8B5CF6'];
+
+  async function runPlan() {
+    const budget = document.getElementById('p-budget').value;
+    const product = document.getElementById('p-product').value;
+    const audience = document.getElementById('p-audience').value;
+
+    if (!budget || !product || !audience) {
+      alert('Please fill in Budget, Product, and Audience.');
+      return;
+    }
+
+    const btn = document.getElementById('plan-btn');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span> Claude is analyzing...';
+
+    const out = document.getElementById('plan-output');
+    out.style.display = 'block';
+    out.innerHTML = '<div class="card" style="color:#666;font-size:13px">Sending brief to Claude via FastAPI...</div>';
+
+    const body = {
+      product: product,
+      budget: parseFloat(budget),
+      objective: document.getElementById('p-objective').value,
+      audience: audience,
+      timeline: parseInt(document.getElementById('p-timeline').value),
+      channels: [...document.querySelectorAll('#plan-chips .chip.on')].map(c => c.textContent.trim())
+    };
+
+    try {
+      const res = await fetch('http://127.0.0.1:8000/plan', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+
+      if (!res.ok) {
+        const err = await res.text();
+        throw new Error(`Server error ${res.status}: ${err}`);
+      }
+
+      const r = await res.json();
+      renderPlanOutput(r, parseFloat(budget));
+
+    } catch(err) {
+      out.innerHTML = `<div class="card"><div class="error">
+        <b>Something went wrong</b><br><br>${err.message}<br><br>
+        Make sure your FastAPI server is running:<br>
+        <code>uvicorn main:app --reload</code>
+      </div></div>`;
+    }
+
+    btn.disabled = false;
+    btn.textContent = 'Analyze Campaign →';
+  }
+
+  function renderPlanOutput(r, budget) {
+    const scoreClass = r.readiness_score >= 75 ? 'score-good' : r.readiness_score >= 50 ? 'score-warn' : 'score-bad';
+    const checkIcon = { pass:'✓', warn:'⚠', fail:'✗' };
+    const checkCls = { pass:'check-pass', warn:'check-warn', fail:'check-fail' };
+
+    const allocHtml = r.budget_allocation.map((a, i) => `
+      <div class="alloc-card">
+        <div class="alloc-ch">${a.channel}</div>
+        <div class="alloc-pct">${a.percentage}%</div>
+        <div class="alloc-usd">$${Number(a.dollar_amount).toLocaleString()}</div>
+        <div class="bar-bg"><div class="bar-fill" style="width:${a.percentage}%;background:${BAR_COLORS[i % BAR_COLORS.length]}"></div></div>
+        <div class="alloc-roas">Est. ROAS <b>${a.expected_roas}</b></div>
+        <div class="alloc-why">${a.rationale}</div>
+      </div>`).join('');
+
+    const checksHtml = r.readiness_checks.map(c => `
+      <div class="check ${checkCls[c.status] || 'check-warn'}">
+        <div class="check-icon">${checkIcon[c.status] || '⚠'}</div>
+        <div>
+          <div class="check-name">${c.item}</div>
+          <div class="check-note">${c.note}</div>
+        </div>
+      </div>`).join('');
+
+    const insightsHtml = r.market_insights.map(i => `
+      <div class="insight insight-${i.type}">
+        <div class="insight-title">${i.title}</div>
+        <div class="insight-body">${i.body}</div>
+      </div>`).join('');
+
+    document.getElementById('plan-output').innerHTML = `
+      <div class="card">
+        <h2>Budget Allocation</h2>
+        <div class="alloc-grid">${allocHtml}</div>
+      </div>
+      <div class="card">
+        <h2>Launch Readiness Score</h2>
+        <div class="score-row">
+          <div class="score-num ${scoreClass}">${r.readiness_score}</div>
+          <div>
+            <div class="score-lbl">${r.readiness_verdict}</div>
+            <div class="score-sub">
+              ${r.readiness_checks.filter(c => c.status === 'fail').length} blockers ·
+              ${r.readiness_checks.filter(c => c.status === 'warn').length} warnings ·
+              ${r.readiness_checks.filter(c => c.status === 'pass').length} passed
+            </div>
+          </div>
+        </div>
+        <div class="checks-grid">${checksHtml}</div>
+      </div>
+      <div class="card">
+        <h2>Market Insights</h2>
+        ${insightsHtml}
+      </div>
+      <div class="card">
+        <h2>Launch Recommendation</h2>
+        <div class="summary-box">
+          <div class="summary-lbl">AI recommendation</div>
+          ${r.launch_recommendation}
+        </div>
+      </div>`;
+  }
+
+  async function runOptimize() {
+    const name = document.getElementById('o-name').value;
+    const roas = document.getElementById('o-roas').value;
+    const spend = document.getElementById('o-spend').value;
+
+    if (!name || !roas || !spend) {
+      alert('Please fill in Campaign Name, ROAS, and Spend at minimum.');
+      return;
+    }
+
+    const btn = document.getElementById('optimize-btn');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span> Claude is diagnosing...';
+
+    const out = document.getElementById('optimize-output');
+    out.style.display = 'block';
+    out.innerHTML = '<div class="card" style="color:#666;font-size:13px">Sending metrics to Claude via FastAPI...</div>';
+
+    const body = {
+      campaign_name: name,
+      channel: document.getElementById('o-channel').value,
+      roas: parseFloat(roas),
+      ctr: parseFloat(document.getElementById('o-ctr').value) || 0,
+      spend: parseFloat(spend),
+      conversion_rate: parseFloat(document.getElementById('o-cvr').value) || 0,
+      frequency: parseFloat(document.getElementById('o-freq').value) || 0,
+      campaign_objective: document.getElementById('o-objective').value
+    };
+
+    try {
+      const res = await fetch('http://127.0.0.1:8000/optimize', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+
+      if (!res.ok) {
+        const err = await res.text();
+        throw new Error(`Server error ${res.status}: ${err}`);
+      }
+
+      const r = await res.json();
+      renderOptimizeOutput(r, name);
+
+    } catch(err) {
+      out.innerHTML = `<div class="card"><div class="error">
+        <b>Something went wrong</b><br><br>${err.message}<br><br>
+        Make sure your FastAPI server is running:<br>
+        <code>uvicorn main:app --reload</code>
+      </div></div>`;
+    }
+
+    btn.disabled = false;
+    btn.textContent = 'Diagnose Campaign →';
+  }
+
+  function renderOptimizeOutput(r, name) {
+    const statusMap = {
+      'underperforming': { cls: 'status-under', label: 'Underperforming' },
+      'on-track': { cls: 'status-track', label: 'On Track' },
+      'at-risk': { cls: 'status-risk', label: 'At Risk' }
+    };
+    const s = statusMap[r.status] || statusMap['at-risk'];
+    const impactCls = { High: 'badge-high', Medium: 'badge-med', Low: 'badge-low' };
+
+    const recsHtml = r.recommendations.map(rec => `
+      <div class="rec-row">
+        <div style="flex:1">
+          <div class="rec-action">${rec.action}</div>
+          <div class="rec-rationale">${rec.rationale}</div>
+          <span class="rec-badge ${impactCls[rec.impact] || 'badge-low'}">${rec.impact} impact</span>
+        </div>
+      </div>`).join('');
+
+    const flagsHtml = r.flags.map(f => `
+      <div class="flag-row">
+        <span class="flag-tag ${f.type === 'human-review' ? 'flag-human' : 'flag-auto'}">
+          ${f.type === 'human-review' ? 'Needs human review' : 'Auto-resolved'}
+        </span>
+        <div>
+          <div class="flag-item">${f.item}</div>
+          <div class="flag-detail">${f.detail}</div>
+        </div>
+      </div>`).join('');
+
+    document.getElementById('optimize-output').innerHTML = `
+      <div class="card">
+        <h2 style="display:flex;align-items:center;justify-content:space-between;gap:10px">
+          ${name}
+          <span class="status-badge ${s.cls}">${s.label}</span>
+        </h2>
+        <div class="insight insight-${r.status === 'on-track' ? 'success' : 'danger'}" style="margin-bottom:0">
+          <div class="insight-title">Root cause</div>
+          <div class="insight-body">${r.root_cause}</div>
+        </div>
+      </div>
+      <div class="card">
+        <h2>Recommended Actions</h2>
+        ${recsHtml}
+      </div>
+      <div class="card">
+        <h2>Stakeholder Summary</h2>
+        <div class="summary-box">
+          <div class="summary-lbl">AI-generated · edit before sending</div>
+          ${r.stakeholder_summary}
+        </div>
+      </div>
+      <div class="card">
+        <h2>Human Review Flags</h2>
+        ${flagsHtml}
+      </div>`;
+  }
+</script>
+</body>
+</html>

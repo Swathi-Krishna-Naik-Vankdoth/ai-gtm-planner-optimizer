@@ -216,7 +216,12 @@ ai-gtm-planner-optimizer/
 ├── requirements.txt  
 ├── .env.example  
 ├── frontend/  
+│   └── ...  
 ├── assets/  
+│   ├── campaign-planning-interface.png  
+│   ├── planning-output.png  
+│   ├── optimization-output.png  
+│   └── fastapi-swagger-docs.png  
 └── README.md  
 
 ## Installation

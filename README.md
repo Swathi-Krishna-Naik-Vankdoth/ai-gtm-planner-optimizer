@@ -211,18 +211,18 @@ Generate executive-ready summaries
 
 ## Project Structure
 
-ai-gtm-planner-optimizer/  
-├── main.py  
-├── requirements.txt  
-├── .env.example  
-├── frontend/  
-│   └── ...  
-├── assets/  
-│   ├── campaign-planning-interface.png  
-│   ├── planning-output.png  
-│   ├── optimization-output.png  
-│   └── fastapi-swagger-docs.png  
-└── README.md  
+ai-gtm-planner-optimizer/
+├── main.py                    # FastAPI app with all endpoints (/plan, /optimize)
+├── requirements.txt           # Python dependencies
+├── .env.example               # Environment variable template (Claude API key)
+├── assets/                    # Screenshots used in README
+│   ├── campaign-planning-interface.png
+│   ├── planning-output.png
+│   ├── optimization-output.png
+│   └── fastapi-swagger-docs.png
+├── frontend/                  # Simple UI (if added / optional)
+│   └── ...
+└── README.md                  # Project documentation
 
 ## Installation
 

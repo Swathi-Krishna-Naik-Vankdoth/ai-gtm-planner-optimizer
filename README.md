@@ -248,11 +248,6 @@ Run:
 uvicorn main:app --reload
 ```
 
-Open:
-
-- API docs → http://127.0.0.1:8000/docs  
-- frontend → http://127.0.0.1:8000/app  
-
 ## Screenshots
 
 ![Campaign Planning](assets/campaign-planning-interface.png)  

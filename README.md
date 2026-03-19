@@ -1,5 +1,11 @@
 # AI GTM Campaign Planner & Optimizer
 
+🔗 **Live Demo:** https://ai-gtm-planner-optimizer.onrender.com/app
+
+📚 **API Docs:** https://ai-gtm-planner-optimizer.onrender.com/docs
+
+👤 **Author:** [Swathi Krishna](https://www.linkedin.com/in/swathikrishna-sk)
+
 AI-powered decision-support system for GTM, marketing, and campaign teams that improves pre-launch planning, live campaign optimization, and stakeholder communication.
 
 Built with Python, FastAPI, and the Anthropic Claude API.
@@ -278,4 +284,7 @@ For educational and portfolio use.
 
 ## Author
 
-Swathi Krishna
+**Swathi Krishna**
+- LinkedIn: https://www.linkedin.com/in/swathikrishna-sk
+- GitHub: https://github.com/Swathi-Krishna-Naik-Vankdoth
+- Live Demo: https://ai-gtm-planner-optimizer.onrender.com/app

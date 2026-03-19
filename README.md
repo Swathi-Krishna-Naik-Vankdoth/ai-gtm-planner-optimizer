@@ -1,322 +1,298 @@
-# AI Launch & Incident Copilot
+# AI GTM Campaign Planner & Optimizer
 
-AI-powered decision-support system for program, engineering, and operations teams that automates incident triage, SOP-based guidance, and stakeholder communication through structured reasoning and grounded document retrieval.
+AI-powered decision-support system for GTM, marketing, and campaign teams that improves pre-launch planning, live campaign optimization, and stakeholder communication through structured reasoning, budget allocation, and performance diagnostics.
 
 Built as an end-to-end product with a FastAPI backend, Claude-powered intelligence, and a lightweight UI for business users.
 
-🔗 **Live Demo:** https://ai-incident-copilot.onrender.com/app/
-
-📚 **API Docs:** https://ai-incident-copilot.onrender.com/docs
-
-👤 **Author:** Swathi Krishna
-
----
+🔗 **Live Demo:** https://ai-gtm-planner-optimizer.onrender.com/app  
+📚 **API Docs:** https://ai-gtm-planner-optimizer.onrender.com/docs  
+👤 **Author:** [Swathi Krishna](https://www.linkedin.com/in/swathikrishna-sk)
 
 ## Overview
 
-AI Launch & Incident Copilot is a business-facing AI application designed to reduce the manual overhead involved in the first phase of incident response and launch execution.
+AI GTM Campaign Planner & Optimizer is a business-facing AI application designed to support the full campaign lifecycle, from planning before launch to diagnosing underperformance during execution and drafting decision-ready updates for leadership or partner teams.
 
-The system helps answer three critical operational questions:
+The system helps answer three critical business questions:
 
-- **Guidance:** What does our SOP say about this situation, and where does that guidance come from?
-- **Triage:** How severe is this incident, who owns it, and what should happen next?
-- **Communication:** How do I turn these raw notes into a clear update for leadership or partner teams?
+1. Planning: Am I allocating budget and preparing this campaign correctly before launch?
+2. Optimization: Why is this campaign underperforming, and what should I do next?
+3. Communication: How do I explain performance issues and recommended actions clearly to stakeholders?
 
-The application is exposed through REST APIs, making it straightforward to integrate into internal workflows, support tools, or launch-readiness processes.
-
----
+The application is exposed through REST APIs, making it easy to integrate into internal tools, campaign workflows, or marketing operations environments.
 
 ## How It Works
 
-1. The user enters a question, incident description, or raw operational notes
-2. The FastAPI backend validates the input and routes it to the appropriate workflow
-3. The Claude API applies structured reasoning to generate a business-ready response
-4. The result is returned through the API and displayed in the UI
-
----
-
+1. The user enters campaign details such as budget, audience, timeline, and channels
+2. The FastAPI backend validates the input and sends a structured prompt to the LLM
+3. The model returns structured business output, including:
+   - budget allocation
+   - readiness checks
+   - market insights
+   - recommendations
+4. The response is returned through the API and displayed in the UI
+   
 ## Why This Matters
 
-This project demonstrates how AI can move beyond generic chat and support real operational workflows — helping teams retrieve grounded policy guidance, triage incidents consistently, and communicate decisions more clearly at scale.
-
----
+This project demonstrates how AI can move beyond generic chat and support real business workflows by helping teams plan campaign investments, diagnose underperformance, and communicate decisions more clearly.
 
 ## Business Problem
 
-In incident-heavy operational environments, the first phase of response is consistently slowed by fragmented information, manual triage, and inconsistent communication across functions.
+Teams running digital campaigns often have strong data visibility but weak decision support.
 
-Across every role, teams face the same friction:
+Before launch, campaign plans are frequently built from past experience, static playbooks, or manual assumptions. Teams may go live without validating budget allocation, audience readiness, channel fit, creative completeness, or launch dependencies.
 
-- **Program Managers** spend time searching through SOPs and escalation policies under time pressure
-- **Engineering Leads** triage severity from incomplete or unstructured notes
-- **Product Managers** convert fragmented Slack threads and status updates into leadership communication
-- **Operations Teams** context-switch between monitoring tools, policy documents, and communication channels simultaneously
-- **Executive Stakeholders** wait on structured updates while the team is heads-down on resolution
+During campaign execution, performance dashboards surface metrics such as ROAS, CTR, spend, and conversion rate, but they do not explain why performance is changing. Diagnosing root cause often requires a skilled analyst manually connecting multiple signals, which slows down response and increases the chance of incorrect decisions.
 
-The result across all phases:
+After a problem is identified, campaign managers still need to translate analysis into a clear recommendation for leadership, finance, or partner teams. That communication step is often manual, inconsistent, and time-consuming.
 
-- slower incident response
-- inconsistent severity classification
-- manual, time-consuming stakeholder communication
-- operational overhead that scales poorly across teams and dependencies
+The result is the same across all three phases:
+- wasted ad spend  
+- slower decisions  
+- missed performance targets  
+- inconsistent stakeholder communication  
 
-This project was built to reduce that friction by combining guidance retrieval, triage, and communication into one AI-assisted workflow.
-
----
+This project was built to reduce that friction by combining planning, optimization, and communication into one AI-assisted workflow.
 
 ## Why I Built This
 
-I built this project around a recurring workflow gap I observed across years of program and operations management — at Amazon managing incident response programs for Prime Video, and at Epsilon coordinating campaign operations across Fortune 500 advertiser integrations.
+I built this project because I saw a recurring gap in campaign and GTM workflows: teams usually have access to data, but not to fast, consistent reasoning that helps them decide what to do next.
 
-The challenge during incidents is often not only solving the issue itself, but coordinating the first layer of response quickly and consistently across teams. Before a team can act decisively, someone has to search through SOPs, determine severity and ownership, interpret raw notes under pressure, and draft updates for stakeholders or leadership.
+In real business settings, campaign managers often need to:
+- evaluate whether a campaign is ready to launch  
+- decide how budget should be distributed across channels  
+- diagnose underperformance using incomplete or scattered signals  
+- communicate recommendations clearly to non-technical stakeholders  
 
-That overhead slows response and creates inconsistent communication — especially when incidents span multiple teams or dependencies.
+Those tasks are critical, but they are also repetitive, judgment-heavy, and time-sensitive.
 
-I wanted to prototype a business AI system that could automate those early-stage workflows and serve as a practical example of how LLM-powered applications can support real operational decision-making.
+I wanted to explore how AI could reduce friction in those workflows by acting as a business-facing decision-support system, one that helps teams plan more intelligently, respond faster during live campaigns, and communicate more clearly with leadership or partners.
 
----
+This project is my attempt to turn that operational gap into an end-to-end AI system that supports faster decisions, clearer communication, and more scalable GTM execution.
 
 ## What the System Does
 
-The system is designed around three core operational workflows.
+The system is designed around two core business workflows.
 
-### 1. SOP and Document Q&A
-Takes a plain-language question as input and returns a grounded answer with source citation drawn from internal policy documents, escalation guides, and launch checklists. Returns "insufficient context" when the answer is not found — no hallucinations.
+### 1. Pre-Launch Campaign Planning
+Takes a campaign brief as input and returns:
+- recommended budget allocation by channel  
+- expected ROAS ranges  
+- market opportunity insights  
+- launch readiness checks  
+- overall launch recommendation  
 
-### 2. Incident Classification
-Takes a plain-language incident description and returns a structured severity assessment including classification (Sev-1/2/3), suggested owner, recommended immediate actions, confidence level, and a caution note for edge cases.
+### 2. Live Campaign Optimization
+Takes live campaign metrics as input and returns:
+- campaign status  
+- likely root-cause diagnosis  
+- prioritized optimization recommendations  
+- stakeholder-ready summary  
+- human-review flags for sensitive decisions  
 
-### 3. Stakeholder Update Generation
-Takes raw, unstructured incident notes and returns a structured executive update including issue summary, business impact, current status, mitigation plan, and next checkpoint.
-
----
+This makes the application more than a dashboard or chatbot. It is a prototype for an AI-powered GTM decision-support tool.
 
 ## Key Capabilities
 
 | Endpoint | Capability | Business Value |
 |---|---|---|
-| `POST /ask` | Answers questions using internal SOPs and launch documentation, with source citation | Reduces time spent searching for policies and escalation guidance |
-| `POST /classify` | Classifies incident severity, suggests owner, recommends next action, includes confidence note | Speeds up triage and improves routing consistency across teams |
-| `POST /draft-update` | Converts raw incident notes into a structured stakeholder update | Improves communication quality and reduces manual drafting effort |
-
----
+| `POST /plan` | Analyzes a campaign brief and recommends budget allocation, readiness checks, and launch guidance | Helps teams make stronger pre-launch decisions before spend begins |
+| `POST /optimize` | Diagnoses live campaign performance, explains likely root causes, and recommends actions | Improves speed and consistency of campaign optimization |
+| `GET /` | Returns app status and docs link | Supports lightweight service health and developer testing |
 
 ## System Workflow
 
-**Retrieve → Assess → Recommend → Communicate → Flag**
+**Detect → Explain → Recommend → Draft → Flag**
 
-- **Retrieve** — Surface relevant guidance from internal SOPs and policy documents
-- **Assess** — Classify severity and identify likely ownership from unstructured input
-- **Recommend** — Suggest next actions based on incident context and policy
-- **Communicate** — Generate structured stakeholder updates from raw notes
-- **Flag** — Surface uncertainty and edge cases that require human review
-
----
+- **Detect** → Identify meaningful campaign or performance signals  
+- **Explain** → Diagnose likely root causes or readiness gaps  
+- **Recommend** → Suggest next actions based on business context  
+- **Draft** → Generate stakeholder-ready communication  
+- **Flag** → Surface decisions that require human review  
 
 ## Architecture
 
-```
-User Input (question / incident description / raw notes)
-        │
-        ▼
-   FastAPI Backend (agent.py)
-        │
-        ├── POST /ask ──────────► Claude API ──► Grounded answer + source citation
-        ├── POST /classify ─────► Claude API ──► Severity + owner + action plan
-        └── POST /draft-update ─► Claude API ──► Structured stakeholder update
-        │
-        ▼
-   JSON Response → Frontend UI (/app)
-```
+User → UI (/app) → FastAPI Backend → Claude API → Structured JSON Response → UI
 
----
+1. **Input Layer** → Campaign brief or live campaign metrics  
+2. **Application Layer** → FastAPI receives and routes the request  
+3. **AI Reasoning Layer** → Claude generates structured business output  
+4. **Response Layer** → Results are returned to the UI and API consumer
 
 ## Tech Stack
 
-| Layer | Technology |
-|---|---|
-| Language | Python 3.11 |
-| API Framework | FastAPI |
-| Data Validation | Pydantic |
-| AI / LLM | Anthropic Claude API (claude-haiku-4-5) |
-| Server | Uvicorn |
-| Deployment | Render |
-| Frontend | Vanilla HTML / CSS / JavaScript |
+- Python  
+- FastAPI  
+- Pydantic  
+- Anthropic Claude API  
+- dotenv  
 
----
+## API Endpoints
+
+### `GET /`
+Returns service status and docs link  
+
+### `POST /plan`
+Returns:
+- budget allocation  
+- readiness checks  
+- insights  
+- launch recommendation  
+
+### `POST /optimize`
+Returns:
+- status  
+- root cause  
+- recommendations  
+- stakeholder summary  
+- flags  
+
+## Example Use Cases
+
+### Pre-Launch Planning
+Validate budget allocation across channels  
+
+### Underperformance Diagnosis
+Understand why metrics dropped  
+
+### Stakeholder Communication
+Generate executive-ready summaries  
 
 ## Sample Input
 
-### POST /ask
+### Example `POST /plan`
+
 ```json
 {
-  "question": "What is the escalation path for a Sev-2 incident?"
+  "product": "New SaaS subscription offering",
+  "budget": 50000,
+  "objective": "Lead generation",
+  "audience": "Mid-market B2B decision makers",
+  "timeline": 6,
+  "channels": ["Search", "Display", "Video"]
 }
 ```
 
-### POST /classify
+### Example `POST /optimize`
+
 ```json
 {
-  "description": "Prime Video homepage is completely down for all users in the US. Started 20 minutes ago. Engineering team is investigating but root cause is unknown."
+  "campaign_name": "Q3 Demand Gen Campaign",
+  "channel": "Meta Ads",
+  "roas": 1.8,
+  "ctr": 0.7,
+  "spend": 22000,
+  "conversion_rate": 1.4,
+  "frequency": 8.9,
+  "campaign_objective": "Leads"
 }
 ```
-
-### POST /draft-update
-```json
-{
-  "notes": "login service throwing 500 errors since 2pm, affects 30% of users, team is investigating, rollback attempted but didnt fix it, engineers still on it"
-}
-```
-
----
 
 ## Sample Output
 
-### Incident Classification
-```
-Severity: Sev-1
-Suggested Owner: VP of Engineering / Incident Commander + P1 On-Call Engineer
-Recommended Action:
-  1. Declare SEV-1 incident immediately
-  2. Page all-hands engineering team (backend, frontend, infrastructure)
-  3. Initiate war room for real-time coordination
-  4. Begin root cause analysis (check deployments, infrastructure, DNS, CDN)
-  5. Prepare public status page update within 5 minutes
-  6. Notify executive stakeholders and communications team
-Confidence: High
-Caution: Verify incident scope is actually all users before full escalation
-```
+### Example Planning Output
 
-### Stakeholder Update
-```
-Issue Summary: The login service has been returning 500 errors since 2:00 PM,
-affecting approximately 30% of users attempting to access the platform.
-
-Business Impact: One-third of the user base is currently unable to log in.
-The team is treating this as a high-severity incident.
-
-Current Status: Engineering team is actively investigating the root cause.
-An initial rollback was attempted but did not resolve the issue.
-
-Mitigation Plan: Engineers remain engaged in troubleshooting to identify
-the root cause. Additional rollbacks, infrastructure changes, or targeted
-fixes are being evaluated.
-
-Next Update: Stakeholders will receive a status update within 30 minutes.
+```json
+{
+  "budget_allocation": [
+    {
+      "channel": "Search",
+      "percentage": 40,
+      "dollar_amount": 20000,
+      "expected_roas": "3.2x",
+      "rationale": "High-intent demand capture supports lead generation goals."
+    }
+  ],
+  "readiness_score": 82,
+  "readiness_verdict": "Needs attention",
+  "launch_recommendation": "Tracking validation required before launch."
+}
 ```
 
----
+### Example Optimization Output
+
+```json
+{
+  "status": "at-risk",
+  "root_cause": "Creative fatigue due to high frequency",
+  "recommendations": [
+    {
+      "action": "Rotate creatives",
+      "impact": "High"
+    }
+  ],
+  "stakeholder_summary": "Campaign efficiency declining due to engagement drop.",
+  "flags": [
+    {
+      "type": "human-review",
+      "item": "Budget reallocation"
+    }
+  ]
+}
+```
 
 ## Project Structure
 
 ```
-ai-incident-copilot/
-├── docs/
-│   ├── escalation_policy.txt     ← Sev-1/2/3 escalation paths and SLAs
-│   ├── launch_checklist.txt      ← Pre-launch readiness requirements
-│   └── incident_sop.txt          ← First 30-minute incident response SOP
-├── assets/
-│   ├── Screenshot1_api.png
-│   ├── Screenshot2_ask.png
-│   ├── Screenshot3_classify.png
-│   └── Screenshot4_draft_update.png
-├── frontend/
-│   └── index.html                ← Lightweight UI for business users
-├── agent.py                      ← FastAPI backend + Claude API integration
-├── requirements.txt
-├── Procfile                      ← Render / Railway deployment config
-├── .env.example                  ← Environment variable template
-└── README.md
+ai-gtm-planner-optimizer/
+├── main.py                    # FastAPI app with all endpoints (/plan, /optimize)
+├── requirements.txt           # Python dependencies
+├── .env.example               # Environment variable template (Claude API key)
+├── assets/                    # Screenshots used in README
+│   ├── campaign-planning-interface.png
+│   ├── planning-output.png
+│   ├── optimization-output.png
+│   └── fastapi-swagger-docs.png
+├── frontend/                  # Lightweight UI for campaign planning and optimization
+│   └── ...
+└── README.md                  # Project documentation
 ```
-
----
 
 ## Installation
 
 ```bash
-# 1. Clone the repo
-git clone https://github.com/Swathi-Krishna-Naik-Vankdoth/ai-incident-copilot.git
-cd ai-incident-copilot
-
-# 2. Install dependencies
+git clone https://github.com/Swathi-Krishna-Naik-Vankdoth/ai-gtm-planner-optimizer.git
+cd ai-gtm-planner-optimizer
 pip install -r requirements.txt
-
-# 3. Set your API key
-cp .env.example .env
-# Add your Anthropic API key to .env
-
-# 4. Run the server
-uvicorn agent:app --reload
-
-# 5. Open the app
-# UI:       http://127.0.0.1:8000/app
-# API docs: http://127.0.0.1:8000/docs
 ```
 
----
+Create `.env`:
 
-## Example Inputs to Try
-
-**POST /ask — Escalation guidance**
-```json
-{"question": "What is the escalation path for a Sev-2 incident?"}
-{"question": "What launch blockers require legal review?"}
-{"question": "What should I do in the first 5 minutes of an incident?"}
-{"question": "What is the refund policy for customers?"}
-```
-The last question should return "insufficient context" — demonstrating grounded retrieval with no hallucination.
-
-**POST /classify — Severity assessment**
-```json
-{"description": "Prime Video homepage is completely down for all US users"}
-{"description": "Search returning no results for 40% of users, login still works"}
-{"description": "Dashboard export to CSV is slow, takes 3 minutes instead of 30 seconds"}
-{"description": "Some users reporting slow load times but we cannot reproduce it"}
+```bash
+ANTHROPIC_API_KEY=your_api_key_here
 ```
 
-**POST /draft-update — Stakeholder communication**
-```json
-{"notes": "login service throwing 500 errors since 2pm, affects 30% of users, rollback failed"}
-{"notes": "idk whats happening, users complaining since noon, john is looking at it, no eta yet"}
-{"notes": "issue resolved at 6:30pm, was down for 2 hours, root cause was memory leak, hotfix deployed"}
-```
+Run:
 
----
+```bash
+uvicorn main:app --reload
+```
 
 ## Screenshots
 
-### Live UI
-![API Overview](assets/Screenshot1_api.png)
+Below are examples of the campaign planning UI, generated outputs, optimization workflow, and FastAPI developer interface.
 
-### Document Q&A — grounded answers with source citation
-![Ask](assets/Screenshot2_ask.png)
-
-### Incident Classifier — severity, owner, and action plan
-![Classify](assets/Screenshot3_classify.png)
-
-### Stakeholder Update — raw notes to executive-ready communication
-![Draft Update](assets/Screenshot4_draft_update.png)
-
----
+![Campaign Planning](assets/campaign-planning-interface.png)  
+![Planning Output](assets/planning-output.png)  
+![Optimization Output](assets/optimization-output.png)  
+![Swagger Docs](assets/fastapi-swagger-docs.png)  
 
 ## Future Improvements
 
-- Vector-based retrieval for larger document collections (RAG)
-- Evaluation pipeline for output quality and consistency
-- Slack and ticketing system integration (PagerDuty, Jira, ServiceNow)
-- Authentication and multi-tenant support
-- Expansion to GTM automation and launch-readiness workflows
-- CSV upload for batch incident analysis
-
----
+- Add nested response schemas for stronger validation  
+- Move prompts into reusable prompt-builder modules  
+- Add error handling for invalid model output  
+- Support CSV upload for multi-campaign analysis  
+- Integrate approval workflows for sensitive recommendations  
+- Add evaluation metrics for recommendation quality and consistency
 
 ## What This Project Demonstrates
 
-- Identifying a high-friction operational workflow that spans multiple business functions
-- Translating that gap into a business-facing AI system with structured, grounded outputs
-- Designing and building an end-to-end Python backend with production-style REST APIs
-- Applying LLMs to structured business workflows rather than generic chat experiences
-- Implementing guardrails — source citation, "insufficient context" responses, confidence notes
-- Deploying a live, accessible application on cloud infrastructure
+- Translating a real GTM workflow gap into an AI-backed product concept  
+- Applying LLMs to structured business reasoning instead of generic chat  
+- Building a FastAPI-based backend with reusable API workflows  
+- Designing human-in-the-loop decision-support systems  
+- Connecting product thinking, business context, and technical execution   
 
-*Built at the intersection of business operations, AI systems, and software engineering.*
+## License
+
+For educational and portfolio use.

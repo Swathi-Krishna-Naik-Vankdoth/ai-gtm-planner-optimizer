@@ -34,10 +34,6 @@
     .btn-run:hover:not(:disabled) { opacity: 0.85; }
     .spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid #ccc; border-top-color: #fff; border-radius: 50%; animation: spin .7s linear infinite; vertical-align: middle; margin-right: 6px; }
     @keyframes spin { to { transform: rotate(360deg); } }
-    .metrics-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 16px; }
-    .metric { background: #f9f9f9; border-radius: 8px; padding: 14px; }
-    .metric-label { font-size: 12px; color: #666; margin-bottom: 4px; }
-    .metric-value { font-size: 22px; font-weight: 700; }
     .alloc-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
     .alloc-card { background: #f9f9f9; border-radius: 8px; padding: 14px; }
     .alloc-ch { font-size: 12px; color: #666; margin-bottom: 4px; }
@@ -220,6 +216,8 @@
 </div>
 
 <script>
+  const API = 'https://ai-gtm-planner-optimizer.onrender.com';
+
   function showPhase(phase) {
     document.getElementById('plan-phase').style.display = phase === 'plan' ? 'block' : 'none';
     document.getElementById('optimize-phase').style.display = phase === 'optimize' ? 'block' : 'none';
@@ -235,52 +233,26 @@
     const budget = document.getElementById('p-budget').value;
     const product = document.getElementById('p-product').value;
     const audience = document.getElementById('p-audience').value;
-
-    if (!budget || !product || !audience) {
-      alert('Please fill in Budget, Product, and Audience.');
-      return;
-    }
-
+    if (!budget || !product || !audience) { alert('Please fill in Budget, Product, and Audience.'); return; }
     const btn = document.getElementById('plan-btn');
     btn.disabled = true;
     btn.innerHTML = '<span class="spinner"></span> Claude is analyzing...';
-
     const out = document.getElementById('plan-output');
     out.style.display = 'block';
     out.innerHTML = '<div class="card" style="color:#666;font-size:13px">Sending brief to Claude via FastAPI...</div>';
-
     const body = {
-      product: product,
-      budget: parseFloat(budget),
+      product, budget: parseFloat(budget),
       objective: document.getElementById('p-objective').value,
-      audience: audience,
-      timeline: parseInt(document.getElementById('p-timeline').value),
+      audience, timeline: parseInt(document.getElementById('p-timeline').value),
       channels: [...document.querySelectorAll('#plan-chips .chip.on')].map(c => c.textContent.trim())
     };
-
     try {
-      const res = await fetch('https://ai-gtm-planner-optimizer.onrender.com/optimize/plan', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body)
-      });
-
-      if (!res.ok) {
-        const err = await res.text();
-        throw new Error(`Server error ${res.status}: ${err}`);
-      }
-
-      const r = await res.json();
-      renderPlanOutput(r, parseFloat(budget));
-
+      const res = await fetch(`${API}/plan`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+      if (!res.ok) throw new Error(`Server error ${res.status}: ${await res.text()}`);
+      renderPlanOutput(await res.json(), parseFloat(budget));
     } catch(err) {
-      out.innerHTML = `<div class="card"><div class="error">
-        <b>Something went wrong</b><br><br>${err.message}<br><br>
-        Make sure your FastAPI server is running:<br>
-        <code>uvicorn main:app --reload</code>
-      </div></div>`;
+      out.innerHTML = `<div class="card"><div class="error"><b>Something went wrong</b><br><br>${err.message}</div></div>`;
     }
-
     btn.disabled = false;
     btn.textContent = 'Analyze Campaign →';
   }
@@ -289,62 +261,38 @@
     const scoreClass = r.readiness_score >= 75 ? 'score-good' : r.readiness_score >= 50 ? 'score-warn' : 'score-bad';
     const checkIcon = { pass:'✓', warn:'⚠', fail:'✗' };
     const checkCls = { pass:'check-pass', warn:'check-warn', fail:'check-fail' };
-
-    const allocHtml = r.budget_allocation.map((a, i) => `
+    const allocHtml = r.budget_allocation.map((a,i) => `
       <div class="alloc-card">
         <div class="alloc-ch">${a.channel}</div>
         <div class="alloc-pct">${a.percentage}%</div>
         <div class="alloc-usd">$${Number(a.dollar_amount).toLocaleString()}</div>
-        <div class="bar-bg"><div class="bar-fill" style="width:${a.percentage}%;background:${BAR_COLORS[i % BAR_COLORS.length]}"></div></div>
+        <div class="bar-bg"><div class="bar-fill" style="width:${a.percentage}%;background:${BAR_COLORS[i%BAR_COLORS.length]}"></div></div>
         <div class="alloc-roas">Est. ROAS <b>${a.expected_roas}</b></div>
         <div class="alloc-why">${a.rationale}</div>
       </div>`).join('');
-
     const checksHtml = r.readiness_checks.map(c => `
-      <div class="check ${checkCls[c.status] || 'check-warn'}">
-        <div class="check-icon">${checkIcon[c.status] || '⚠'}</div>
-        <div>
-          <div class="check-name">${c.item}</div>
-          <div class="check-note">${c.note}</div>
-        </div>
+      <div class="check ${checkCls[c.status]||'check-warn'}">
+        <div class="check-icon">${checkIcon[c.status]||'⚠'}</div>
+        <div><div class="check-name">${c.item}</div><div class="check-note">${c.note}</div></div>
       </div>`).join('');
-
     const insightsHtml = r.market_insights.map(i => `
       <div class="insight insight-${i.type}">
         <div class="insight-title">${i.title}</div>
         <div class="insight-body">${i.body}</div>
       </div>`).join('');
-
     document.getElementById('plan-output').innerHTML = `
-      <div class="card">
-        <h2>Budget Allocation</h2>
-        <div class="alloc-grid">${allocHtml}</div>
-      </div>
-      <div class="card">
-        <h2>Launch Readiness Score</h2>
+      <div class="card"><h2>Budget Allocation</h2><div class="alloc-grid">${allocHtml}</div></div>
+      <div class="card"><h2>Launch Readiness Score</h2>
         <div class="score-row">
           <div class="score-num ${scoreClass}">${r.readiness_score}</div>
-          <div>
-            <div class="score-lbl">${r.readiness_verdict}</div>
-            <div class="score-sub">
-              ${r.readiness_checks.filter(c => c.status === 'fail').length} blockers ·
-              ${r.readiness_checks.filter(c => c.status === 'warn').length} warnings ·
-              ${r.readiness_checks.filter(c => c.status === 'pass').length} passed
-            </div>
-          </div>
+          <div><div class="score-lbl">${r.readiness_verdict}</div>
+          <div class="score-sub">${r.readiness_checks.filter(c=>c.status==='fail').length} blockers · ${r.readiness_checks.filter(c=>c.status==='warn').length} warnings · ${r.readiness_checks.filter(c=>c.status==='pass').length} passed</div></div>
         </div>
         <div class="checks-grid">${checksHtml}</div>
       </div>
-      <div class="card">
-        <h2>Market Insights</h2>
-        ${insightsHtml}
-      </div>
-      <div class="card">
-        <h2>Launch Recommendation</h2>
-        <div class="summary-box">
-          <div class="summary-lbl">AI recommendation</div>
-          ${r.launch_recommendation}
-        </div>
+      <div class="card"><h2>Market Insights</h2>${insightsHtml}</div>
+      <div class="card"><h2>Launch Recommendation</h2>
+        <div class="summary-box"><div class="summary-lbl">AI recommendation</div>${r.launch_recommendation}</div>
       </div>`;
   }
 
@@ -352,113 +300,61 @@
     const name = document.getElementById('o-name').value;
     const roas = document.getElementById('o-roas').value;
     const spend = document.getElementById('o-spend').value;
-
-    if (!name || !roas || !spend) {
-      alert('Please fill in Campaign Name, ROAS, and Spend at minimum.');
-      return;
-    }
-
+    if (!name || !roas || !spend) { alert('Please fill in Campaign Name, ROAS, and Spend.'); return; }
     const btn = document.getElementById('optimize-btn');
     btn.disabled = true;
     btn.innerHTML = '<span class="spinner"></span> Claude is diagnosing...';
-
     const out = document.getElementById('optimize-output');
     out.style.display = 'block';
     out.innerHTML = '<div class="card" style="color:#666;font-size:13px">Sending metrics to Claude via FastAPI...</div>';
-
     const body = {
       campaign_name: name,
       channel: document.getElementById('o-channel').value,
       roas: parseFloat(roas),
-      ctr: parseFloat(document.getElementById('o-ctr').value) || 0,
+      ctr: parseFloat(document.getElementById('o-ctr').value)||0,
       spend: parseFloat(spend),
-      conversion_rate: parseFloat(document.getElementById('o-cvr').value) || 0,
-      frequency: parseFloat(document.getElementById('o-freq').value) || 0,
+      conversion_rate: parseFloat(document.getElementById('o-cvr').value)||0,
+      frequency: parseFloat(document.getElementById('o-freq').value)||0,
       campaign_objective: document.getElementById('o-objective').value
     };
-
     try {
-      const res = await fetch('https://ai-gtm-planner-optimizer.onrender.com/optimize', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body)
-      });
-
-      if (!res.ok) {
-        const err = await res.text();
-        throw new Error(`Server error ${res.status}: ${err}`);
-      }
-
-      const r = await res.json();
-      renderOptimizeOutput(r, name);
-
+      const res = await fetch(`${API}/optimize`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+      if (!res.ok) throw new Error(`Server error ${res.status}: ${await res.text()}`);
+      renderOptimizeOutput(await res.json(), name);
     } catch(err) {
-      out.innerHTML = `<div class="card"><div class="error">
-        <b>Something went wrong</b><br><br>${err.message}<br><br>
-        Make sure your FastAPI server is running:<br>
-        <code>uvicorn main:app --reload</code>
-      </div></div>`;
+      out.innerHTML = `<div class="card"><div class="error"><b>Something went wrong</b><br><br>${err.message}</div></div>`;
     }
-
     btn.disabled = false;
     btn.textContent = 'Diagnose Campaign →';
   }
 
   function renderOptimizeOutput(r, name) {
-    const statusMap = {
-      'underperforming': { cls: 'status-under', label: 'Underperforming' },
-      'on-track': { cls: 'status-track', label: 'On Track' },
-      'at-risk': { cls: 'status-risk', label: 'At Risk' }
-    };
-    const s = statusMap[r.status] || statusMap['at-risk'];
-    const impactCls = { High: 'badge-high', Medium: 'badge-med', Low: 'badge-low' };
-
+    const statusMap = { 'underperforming':{cls:'status-under',label:'Underperforming'}, 'on-track':{cls:'status-track',label:'On Track'}, 'at-risk':{cls:'status-risk',label:'At Risk'} };
+    const s = statusMap[r.status]||statusMap['at-risk'];
+    const impactCls = { High:'badge-high', Medium:'badge-med', Low:'badge-low' };
     const recsHtml = r.recommendations.map(rec => `
-      <div class="rec-row">
-        <div style="flex:1">
-          <div class="rec-action">${rec.action}</div>
-          <div class="rec-rationale">${rec.rationale}</div>
-          <span class="rec-badge ${impactCls[rec.impact] || 'badge-low'}">${rec.impact} impact</span>
-        </div>
-      </div>`).join('');
-
+      <div class="rec-row"><div style="flex:1">
+        <div class="rec-action">${rec.action}</div>
+        <div class="rec-rationale">${rec.rationale}</div>
+        <span class="rec-badge ${impactCls[rec.impact]||'badge-low'}">${rec.impact} impact</span>
+      </div></div>`).join('');
     const flagsHtml = r.flags.map(f => `
       <div class="flag-row">
-        <span class="flag-tag ${f.type === 'human-review' ? 'flag-human' : 'flag-auto'}">
-          ${f.type === 'human-review' ? 'Needs human review' : 'Auto-resolved'}
-        </span>
-        <div>
-          <div class="flag-item">${f.item}</div>
-          <div class="flag-detail">${f.detail}</div>
-        </div>
+        <span class="flag-tag ${f.type==='human-review'?'flag-human':'flag-auto'}">${f.type==='human-review'?'Needs human review':'Auto-resolved'}</span>
+        <div><div class="flag-item">${f.item}</div><div class="flag-detail">${f.detail}</div></div>
       </div>`).join('');
-
     document.getElementById('optimize-output').innerHTML = `
       <div class="card">
-        <h2 style="display:flex;align-items:center;justify-content:space-between;gap:10px">
-          ${name}
-          <span class="status-badge ${s.cls}">${s.label}</span>
-        </h2>
-        <div class="insight insight-${r.status === 'on-track' ? 'success' : 'danger'}" style="margin-bottom:0">
-          <div class="insight-title">Root cause</div>
-          <div class="insight-body">${r.root_cause}</div>
+        <h2 style="display:flex;align-items:center;justify-content:space-between;gap:10px">${name}<span class="status-badge ${s.cls}">${s.label}</span></h2>
+        <div class="insight insight-${r.status==='on-track'?'success':'danger'}" style="margin-bottom:0">
+          <div class="insight-title">Root cause</div><div class="insight-body">${r.root_cause}</div>
         </div>
       </div>
-      <div class="card">
-        <h2>Recommended Actions</h2>
-        ${recsHtml}
+      <div class="card"><h2>Recommended Actions</h2>${recsHtml}</div>
+      <div class="card"><h2>Stakeholder Summary</h2>
+        <div class="summary-box"><div class="summary-lbl">AI-generated · edit before sending</div>${r.stakeholder_summary}</div>
       </div>
-      <div class="card">
-        <h2>Stakeholder Summary</h2>
-        <div class="summary-box">
-          <div class="summary-lbl">AI-generated · edit before sending</div>
-          ${r.stakeholder_summary}
-        </div>
-      </div>
-      <div class="card">
-        <h2>Human Review Flags</h2>
-        ${flagsHtml}
-      </div>`;
+      <div class="card"><h2>Human Review Flags</h2>${flagsHtml}</div>`;
   }
 </script>
 </body>

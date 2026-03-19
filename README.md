@@ -1,14 +1,12 @@
 # AI GTM Campaign Planner & Optimizer
 
-🔗 **Live Demo:** https://ai-gtm-planner-optimizer.onrender.com/app
+AI-powered decision-support system for GTM, marketing, and campaign teams that improves pre-launch planning, live campaign optimization, and stakeholder communication through structured reasoning, budget allocation, and performance diagnostics.
 
-📚 **API Docs:** https://ai-gtm-planner-optimizer.onrender.com/docs
+Built as an end-to-end product with a FastAPI backend, Claude-powered intelligence, and a lightweight UI for business users.
 
+🔗 **Live Demo:** https://ai-gtm-planner-optimizer.onrender.com/app  
+📚 **API Docs:** https://ai-gtm-planner-optimizer.onrender.com/docs  
 👤 **Author:** [Swathi Krishna](https://www.linkedin.com/in/swathikrishna-sk)
-
-AI-powered decision-support system for GTM, marketing, and campaign teams that improves pre-launch planning, live campaign optimization, and stakeholder communication.
-
-Built with Python, FastAPI, and the Anthropic Claude API.
 
 ## Overview
 
@@ -21,6 +19,21 @@ The system helps answer three critical business questions:
 3. Communication: How do I explain performance issues and recommended actions clearly to stakeholders?
 
 The application is exposed through REST APIs, making it easy to integrate into internal tools, campaign workflows, or marketing operations environments.
+
+## How It Works
+
+1. User enters campaign details (budget, audience, channels)
+2. Backend processes input and sends structured prompt to LLM
+3. AI generates:
+   - Budget allocation
+   - Readiness checks
+   - Market insights
+   - Recommendations
+4. Output is returned via API and displayed in UI
+   
+## Why This Matters
+
+This project demonstrates how AI can move beyond generic chat and support real business workflows by helping teams plan campaign investments, diagnose underperformance, and communicate decisions more clearly.
 
 ## Business Problem
 
@@ -98,10 +111,12 @@ This makes the application more than a dashboard or chatbot. It is a prototype f
 
 ## Architecture
 
-1. Input Layer → campaign brief or metrics  
-2. FastAPI Layer → routes request  
-3. Claude API → structured reasoning  
-4. Response Layer → business-ready output  
+User → UI (/app) → FastAPI Backend → Claude API → Structured JSON Response → UI
+
+1. **Input Layer** → Campaign brief or live campaign metrics  
+2. **Application Layer** → FastAPI receives and routes the request  
+3. **AI Reasoning Layer** → Claude generates structured business output  
+4. **Response Layer** → Results are returned to the UI and API consumer
 
 ## Tech Stack
 
@@ -217,8 +232,6 @@ Generate executive-ready summaries
 
 ## Project Structure
 
-## Project Structure
-
 ```
 ai-gtm-planner-optimizer/
 ├── main.py                    # FastAPI app with all endpoints (/plan, /optimize)
@@ -256,6 +269,8 @@ uvicorn main:app --reload
 
 ## Screenshots
 
+Below are examples of the campaign planning UI, generated outputs, optimization workflow, and FastAPI developer interface.
+
 ![Campaign Planning](assets/campaign-planning-interface.png)  
 ![Planning Output](assets/planning-output.png)  
 ![Optimization Output](assets/optimization-output.png)  
@@ -263,12 +278,12 @@ uvicorn main:app --reload
 
 ## Future Improvements
 
-- Adding nested response schemas for stronger validation  
-- Prompt modularization: Moving prompts into reusable prompt-builder modules
-- Error handling: Adding error handling for invalid model output 
-- CSV uploads: Supporting CSV upload for multi-campaign analysis 
-- Approval workflows: Integrating approval workflows for sensitive recommendations 
-- Evaluation metrics: Adding evaluation metrics for recommendation quality and consistency
+- Add nested response schemas for stronger validation  
+- Move prompts into reusable prompt-builder modules  
+- Add error handling for invalid model output  
+- Support CSV upload for multi-campaign analysis  
+- Integrate approval workflows for sensitive recommendations  
+- Add evaluation metrics for recommendation quality and consistency
 
 ## What This Project Demonstrates
 
@@ -281,10 +296,3 @@ uvicorn main:app --reload
 ## License
 
 For educational and portfolio use.
-
-## Author
-
-**Swathi Krishna**
-- LinkedIn: https://www.linkedin.com/in/swathikrishna-sk
-- GitHub: https://github.com/Swathi-Krishna-Naik-Vankdoth
-- Live Demo: https://ai-gtm-planner-optimizer.onrender.com/app

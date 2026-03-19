@@ -22,14 +22,14 @@ The application is exposed through REST APIs, making it easy to integrate into i
 
 ## How It Works
 
-1. User enters campaign details (budget, audience, channels)
-2. Backend processes input and sends structured prompt to LLM
-3. AI generates:
-   - Budget allocation
-   - Readiness checks
-   - Market insights
-   - Recommendations
-4. Output is returned via API and displayed in UI
+1. The user enters campaign details such as budget, audience, timeline, and channels
+2. The FastAPI backend validates the input and sends a structured prompt to the LLM
+3. The model returns structured business output, including:
+   - budget allocation
+   - readiness checks
+   - market insights
+   - recommendations
+4. The response is returned through the API and displayed in the UI
    
 ## Why This Matters
 
@@ -103,11 +103,11 @@ This makes the application more than a dashboard or chatbot. It is a prototype f
 
 **Detect → Explain → Recommend → Draft → Flag**
 
-- Detect → Identify meaningful signals  
-- Explain → Diagnose root causes  
-- Recommend → Suggest next actions  
-- Draft → Generate stakeholder communication  
-- Flag → Identify decisions needing human review  
+- **Detect** → Identify meaningful campaign or performance signals  
+- **Explain** → Diagnose likely root causes or readiness gaps  
+- **Recommend** → Suggest next actions based on business context  
+- **Draft** → Generate stakeholder-ready communication  
+- **Flag** → Surface decisions that require human review  
 
 ## Architecture
 
@@ -242,7 +242,7 @@ ai-gtm-planner-optimizer/
 │   ├── planning-output.png
 │   ├── optimization-output.png
 │   └── fastapi-swagger-docs.png
-├── frontend/                  # Simple UI (if added / optional)
+├── frontend/                  # Lightweight UI for campaign planning and optimization
 │   └── ...
 └── README.md                  # Project documentation
 ```
@@ -287,11 +287,11 @@ Below are examples of the campaign planning UI, generated outputs, optimization 
 
 ## What This Project Demonstrates
 
-- Real-world problem solving  
-- AI for business reasoning  
-- Backend system design  
-- API-based architecture  
-- Human-in-the-loop workflows  
+- Translating a real GTM workflow gap into an AI-backed product concept  
+- Applying LLMs to structured business reasoning instead of generic chat  
+- Building a FastAPI-based backend with reusable API workflows  
+- Designing human-in-the-loop decision-support systems  
+- Connecting product thinking, business context, and technical execution   
 
 ## License
 

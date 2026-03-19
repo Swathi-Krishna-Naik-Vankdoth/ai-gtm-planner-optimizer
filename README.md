@@ -211,6 +211,9 @@ Generate executive-ready summaries
 
 ## Project Structure
 
+## Project Structure
+
+```
 ai-gtm-planner-optimizer/
 ├── main.py                    # FastAPI app with all endpoints (/plan, /optimize)
 ├── requirements.txt           # Python dependencies
@@ -223,6 +226,7 @@ ai-gtm-planner-optimizer/
 ├── frontend/                  # Simple UI (if added / optional)
 │   └── ...
 └── README.md                  # Project documentation
+```
 
 ## Installation
 
